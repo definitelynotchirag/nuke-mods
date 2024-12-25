@@ -1,0 +1,32 @@
+{
+  "name": "nuke-mods",
+  "version": "1.0.1",
+  "description": "Save your Space! A npm package which can delete all the node_modules taking up space from a folder having multiple projects.",
+  "keywords": [
+    "node_modules",
+    "delete",
+    "modules",
+    "nuke"
+  ],
+  "homepage": "https://github.com/definitelynotchirag/nuke-mods#readme",
+  "bugs": {
+    "url": "https://github.com/definitelynotchirag/nuke-mods/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/definitelynotchirag/nuke-mods.git"
+  },
+  "license": "ISC",
+  "author": "Chirag <chiragdave1888@gmail.com>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "rimraf": "^6.0.1"
+  },
+  "bin": {
+    "nuke-mods": "index.js"
+  }
+}
