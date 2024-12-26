@@ -1,6 +1,6 @@
 {
   "name": "nuke-mods",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Save your Space! A npm package which can delete all the node_modules taking up space from a folder having multiple projects.",
   "keywords": [
     "node_modules",
