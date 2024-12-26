@@ -4,18 +4,30 @@ const fs = require('fs/promises');
 const path = require('path');
 const rimraf = require('rimraf');
 
-async function deleteNodeModules(dir) {
+/**
+ * Delete all `node_modules` directories within a given folder.
+ * Excludes directories specified in the `excludeFolders` array.
+ */
+async function deleteNodeModules(dir, excludeFolders = []) {
   try {
     const entries = await fs.readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 
-      if (entry.isDirectory() && entry.name === 'node_modules') {
-        console.log(`Deleting: ${fullPath}`);
-        rimraf.sync(fullPath); // Cross-platform folder deletion
-      } else if (entry.isDirectory()) {
-        await deleteNodeModules(fullPath); // Recursively check subdirectories
+      // Skip excluded folders (match exact paths)
+      if (excludeFolders.includes(fullPath)) {
+        console.log(`Skipping: ${fullPath}`);
+        continue;
+      }
+
+      if (entry.isDirectory()) {
+        if (entry.name === "node_modules") {
+          console.log(`Deleting: ${fullPath}`);
+          rimraf.sync(fullPath); // Delete the node_modules folder
+        } else {
+          await deleteNodeModules(fullPath, excludeFolders); // Recursively check subdirectories
+        }
       }
     }
   } catch (err) {
@@ -23,10 +35,31 @@ async function deleteNodeModules(dir) {
   }
 }
 
+/**
+ * Main logic to handle arguments and call deleteNodeModules for each folder.
+ */
 (async () => {
-  // Get the directory from arguments or use the current working directory
-  const targetDir = process.argv[2] || process.cwd();
-  console.log(`Scanning directory: ${targetDir}`);
-  await deleteNodeModules(path.resolve(targetDir));
-  console.log('All node_modules folders deleted.');
+  // Parse arguments
+  const args = process.argv.slice(2);
+
+  // Target folders to search for node_modules
+  const targetFoldersArg = args.find(arg => !arg.startsWith("--exclude="));
+  const targetFolders = targetFoldersArg ? targetFoldersArg.split(",") : [process.cwd()];
+
+  // Folders to exclude
+  const excludeArg = args.find(arg => arg.startsWith("--exclude="));
+  const excludeFolders = excludeArg ? excludeArg.split("=")[1].split(",").map(ex => path.resolve(ex)) : [];
+
+  console.log(`Target folders to search: ${targetFolders.join(", ")}`);
+  if (excludeFolders.length > 0) {
+    console.log(`Excluding folders: ${excludeFolders.join(", ")}`);
+  }
+
+  // Process each target folder
+  for (const folder of targetFolders) {
+    console.log(`Processing folder: ${folder}`);
+    await deleteNodeModules(path.resolve(folder), excludeFolders);
+  }
+
+  console.log("Node_modules deletion completed!");
 })();
